@@ -69,6 +69,22 @@ https://<username>.github.io/<repo>/museum/
 
 五张徽记图仍为当前占位版本，待后续替换为最终原创图。
 
+## 旧版视觉记录
+
+以下五张是改名前截图，HUD 和标题仍是旧版，仅作为开发记录，不代表当前五相版。
+
+![旧版 · 龙位](media/legacy/legacy-01-long.jpg)
+
+![旧版 · 鹰位](media/legacy/legacy-02-ying.jpg)
+
+![旧版 · 犀位](media/legacy/legacy-03-xi.jpg)
+
+![旧版 · 虎位](media/legacy/legacy-04-hu.jpg)
+
+![旧版 · 鹤位](media/legacy/legacy-05-he.jpg)
+
+> 如果要公开仓库，建议先删除 `media/legacy/` 或替换成五相版截图。
+
 ## 授权状态
 
 当前仓库**未附开源许可证**，默认保留所有权利。
