@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#02070d">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="EPR 研究所 · 五相轨道光能阵列。程序化 Three.js 交互式光能传输装置，六瓣采集、相位调制、六相接收与结构拆解可视化。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20fill='%2302070d'/%3E%3Cpath%20d='M32%206%2055%2019v26L32%2058%209%2045V19Z'%20fill='none'%20stroke='%238bf5ff'%20stroke-width='2'/%3E%3Cpath%20d='M22%2024h20v7H30v10h-8Zm8%2015h12v8H30Z'%20fill='%238bf5ff'/%3E%3C/svg%3E">
+  <title>EPR 五相阵列 // 轨道光能传输阵列</title>
+  <!--
+    ERP ORBITAL PHOTON TRANSFER ARRAY
+    Procedural WebGL concept artwork for the original EPR / Five Phase orbital array setting.
+    This is an original Five Phase concept visualization, not real engineering data.
+    Bundled: Three.js r170 (MIT), Orbitron & Rajdhani fonts (SIL OFL 1.1, via Fontsource).
+  -->
+  <style>/*__STYLE__*/</style>
+</head>
+<body class="is-booting">
+  <div id="app">
+    <canvas id="scene" aria-label="EPR 五相轨道光能阵列三维拆解可视化"></canvas>
+
+    <div class="fx-vignette" aria-hidden="true"></div>
+    <div class="fx-scanlines" aria-hidden="true"></div>
+    <div class="fx-noise" aria-hidden="true"></div>
+    <div class="fx-edgeframe" aria-hidden="true">
+      <i class="corner corner-tl"></i>
+      <i class="corner corner-tr"></i>
+      <i class="corner corner-bl"></i>
+      <i class="corner corner-br"></i>
+    </div>
+
+    <svg id="tagSvg" class="tag-svg" aria-hidden="true"></svg>
+    <div id="tagLayer" class="tag-layer" aria-label="关键部件标注"></div>
+
+    <div class="hud">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path class="mark-hex" d="M32 3 57 17.5v29L32 61 7 46.5v-29Z"/>
+              <path class="mark-inner" d="M23 17h21v7H30v8h12v7H30v8h14v7H23Z"/>
+              <path class="mark-orbit" d="M7 32h50M32 3v58" />
+            </svg>
+            <span class="mark-corner"></span>
+          </div>
+          <div class="brand-copy">
+            <div class="brand-kicker">
+              <span>EARTH PLANET RESEARCH / EPR 研究所</span>
+              <i></i>
+              <span>ORBITAL DIVISION / 07</span>
+            </div>
+            <div class="brand-title">
+              <h1>五相 · 轨道光能阵列</h1>
+              <span class="brand-en">FIVE PHASE ORBITAL ARRAY <b>// LS-07</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mission-readout" aria-hidden="true">
+          <div class="mr-cell">
+            <span class="mr-label">ORBIT / 轨道</span>
+            <strong>40,000 <em>KM</em></strong>
+          </div>
+          <div class="mr-cell">
+            <span class="mr-label">MODE / 状态</span>
+            <strong class="cyan">传输待命</strong>
+          </div>
+          <div class="mr-cell">
+            <span class="mr-label">LINK / 链路</span>
+            <strong><i class="live-dot"></i>SECURE</strong>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <div class="armor-picker" id="armorPicker">
+            <button id="armorBtn" class="armor-trigger" type="button" aria-label="选择五相模式" aria-haspopup="menu" aria-controls="armorMenu" aria-expanded="false">
+              <i class="armor-swatch" id="armorSwatch" aria-hidden="true"></i>
+              <span class="armor-trigger__copy">
+                <b id="armorName">龙</b>
+                <em>PHASE MODE</em>
+              </span>
+              <svg class="armor-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>
+            </button>
+            <div class="armor-menu" id="armorMenu" role="menu" aria-labelledby="armorBtn" inert>
+              <div class="armor-menu__head">
+                <span>五相模式</span>
+                <b>FIVE PHASE</b>
+              </div>
+              <div class="armor-options" id="armorOptions"></div>
+              <div class="armor-menu__foot">
+                <span>LASER / ENERGY</span>
+                <i></i>
+                <b id="armorCurrentEn">DRAGON PHASE</b>
+              </div>
+            </div>
+          </div>
+          <button id="panelToggle" class="icon-btn matrix-btn" type="button" data-tip="模块矩阵" aria-label="打开模块矩阵" aria-controls="moduleRail" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h11"/><circle cx="19" cy="19" r="2.2"/></svg>
+          </button>
+          <button id="rotateBtn" class="icon-btn is-on" type="button" data-tip="自动环绕 [A]" aria-label="切换自动环绕" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-1.2 5.2"/><path d="M20 5v6h-6"/></svg>
+          </button>
+          <button id="labelsBtn" class="icon-btn is-on" type="button" data-tip="部件标注 [L]" aria-label="切换部件标注" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M11 10l7 7M14 7h6v6"/></svg>
+          </button>
+          <button id="soundBtn" class="icon-btn" type="button" data-tip="声音 [M]" aria-label="切换声音" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="sound-wave" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="sound-wave" d="M19 6a8.5 8.5 0 0 1 0 12"/><path class="sound-off" d="M3 3l18 18"/></svg>
+          </button>
+          <button id="resetBtn" class="icon-btn" type="button" data-tip="复位视角 [R]" aria-label="复位视角">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5"/><path d="M5.6 15a7 7 0 1 0 .1-6.7"/></svg>
+          </button>
+          <button id="helpBtn" class="icon-btn" type="button" data-tip="操作指南 [?]" aria-label="打开操作指南">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.2a2.4 2.4 0 0 1 4.65.75c0 1.65-2.35 2.05-2.35 3.8"/><path d="M12 17h.01"/></svg>
+          </button>
+          <button id="fullscreenBtn" class="icon-btn" type="button" data-tip="全屏 [F]" aria-label="切换全屏">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></svg>
+          </button>
+          <button id="archiveBtn" class="icon-btn archive-btn" type="button" data-tip="结构档案" aria-label="打开结构档案" aria-controls="inspector" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h9l5 5v12H5z"/><path d="M14 3.5v5h5"/><path d="M8.5 12h7M8.5 15.5h5"/></svg>
+            <span>结构档案</span>
+            <i class="archive-dot" aria-hidden="true"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="system-line" aria-hidden="true">
+        <span>SYS://EPR-LS-07</span>
+        <i></i>
+        <span>PHOTON TRANSFER ARRAY</span>
+        <i></i>
+        <span>EPR / FIVE PHASE ARRAY</span>
+        <i></i>
+        <span class="mono" id="clockReadout">00:00:00</span>
+      </div>
+
+      <aside class="panel module-rail" id="moduleRail" aria-label="模块矩阵">
+        <div class="panel-head">
+          <div class="panel-eyebrow">
+            <i class="sq"></i>
+            <b>MODULE MATRIX</b>
+            <span>模块矩阵</span>
+          </div>
+          <span class="panel-count" id="moduleCount">10 功能段 / 20 标注</span>
+        </div>
+        <div class="part-list" id="partList"></div>
+        <details class="subtag-block">
+          <summary><span>新增部件标注</span><b id="subtagCount">10</b></summary>
+          <div class="subtag-list" id="subtagList"></div>
+        </details>
+        <div class="rail-foot">
+          <span><i class="live-dot"></i>STRUCTURE ONLINE</span>
+          <span class="rail-meters"><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+      </aside>
+
+      <aside class="panel inspector-panel" id="inspector" aria-label="结构档案" aria-hidden="true" inert>
+        <div class="panel-head">
+          <div class="panel-eyebrow">
+            <i class="sq"></i>
+            <b>ASSEMBLY LENS</b>
+            <span>结构档案</span>
+          </div>
+          <div class="panel-head-tools">
+            <span class="panel-count" id="inspectorCount">OVERVIEW</span>
+            <button id="inspectorClose" class="micro-btn" type="button" aria-label="收起结构档案">×</button>
+          </div>
+        </div>
+        <div class="inspector-scroll" id="panelContent"></div>
+        <div class="inspector-foot">
+          <span>ORIGINAL CONCEPT / 五相设定</span>
+          <span id="inspectorFootCode">EPR-DOC / 07</span>
+        </div>
+      </aside>
+
+      <div class="quick-guide" aria-hidden="true">
+        <span class="mouse-icon"></span>
+        <span class="qg-copy">
+          <span>拖拽 360° 环绕 · 滚轮缩放 · 点击部件选中 · 右上角开启档案</span>
+          <b>DRAG / SCROLL / SELECT &nbsp;·&nbsp; ARCHIVE ↗ &nbsp;·&nbsp; [SPACE] 拆解</b>
+        </span>
+      </div>
+
+      <div class="telemetry" aria-hidden="true">
+        <div class="telemetry-head"><span>ORBITAL TELEMETRY</span><i></i><span id="fpsReadout">REALTIME</span></div>
+        <div class="telemetry-row"><span>SOLAR FLUX</span><b>1,361 W/m²</b><i class="bar"><em style="width:86%"></em></i></div>
+        <div class="telemetry-row"><span>RING SYNC</span><b>96.4%</b><i class="bar"><em style="width:96%"></em></i></div>
+        <div class="telemetry-row"><span>BEAM ALIGN</span><b>READY</b><i class="bar"><em style="width:74%"></em></i></div>
+      </div>
+
+      <div class="edge-caption edge-caption-left" aria-hidden="true">
+        <span>ORBITAL PLATFORM</span><i></i><span>40,000 KM</span>
+      </div>
+      <div class="edge-caption edge-caption-right" aria-hidden="true">
+        <span>LINK STABLE</span><i></i><span>EPR / DEEP SPACE</span>
+      </div>
+
+      <section class="dock" aria-label="拆解控制台">
+        <div class="dock-topline">
+          <span><i class="sq"></i> SEQUENCE CONTROL / 变形序列</span>
+          <span class="dock-lock"><i class="live-dot"></i> STRUCTURE LINK <b id="lockStatus">ENGAGED</b></span>
+        </div>
+        <div class="dock-body">
+          <button id="demoBtn" class="ghost-btn demo-btn" type="button">
+            <span class="demo-ico"><i></i></span>
+            <span class="btn-copy"><b>12s 变形演示</b><em>AUTO CYCLE</em></span>
+          </button>
+          <div class="slider-block">
+            <div class="slider-top">
+              <span class="slider-title"><b id="explodeStage">形态锁定</b><em id="explodeStageEn">HARD DOCK</em></span>
+              <span class="slider-value"><b id="explodePct">000</b><em>%</em></span>
+            </div>
+            <input id="explodeRange" class="explode-range" type="range" min="0" max="100" step="1" value="0" aria-label="拆解进度">
+            <div class="range-ticks" aria-hidden="true">
+              <span>锁定</span>
+              <span>展开</span>
+              <span>分离</span>
+              <span>全览</span>
+            </div>
+          </div>
+          <button id="explodeBtn" class="primary-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2.8 20 7.3v9.4L12 21.2 4 16.7V7.3L12 2.8Z"/>
+              <path d="M12 7.2v4.6M12 16.8v-2.1M8.1 9.4l3.9 2.4M15.9 14.6 12 12.2"/>
+              <circle cx="12" cy="12" r="1.3"/>
+            </svg>
+            <span id="explodeBtnLabel">拆解</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <div class="boot-screen" id="bootScreen" role="dialog" aria-label="系统启动">
+      <div class="boot-grid" aria-hidden="true"></div>
+      <div class="boot-corner boot-corner-tl"></div>
+      <div class="boot-corner boot-corner-tr"></div>
+      <div class="boot-corner boot-corner-bl"></div>
+      <div class="boot-corner boot-corner-br"></div>
+      <div class="boot-inner">
+        <div class="boot-emblem">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <path class="be-hex" d="M60 6 109 34v52L60 114 11 86V34Z"/>
+            <path class="be-hex-inner" d="M60 20 96 40.5v39L60 100 24 79.5v-39Z"/>
+            <path class="be-mark" d="M42 37h37v12H56v12h20v11H56v14h23v12H42Z"/>
+            <path class="be-scan" d="M18 68h84"/>
+          </svg>
+          <span class="be-orbit"></span>
+        </div>
+        <div class="boot-kicker">EARTH PLANET RESEARCH / ORBITAL DIVISION</div>
+        <h2>五相 · 轨道光能阵列</h2>
+        <div class="boot-sub">FIVE PHASE ORBITAL ARRAY <b>// LS-07</b></div>
+        <div class="boot-divider"><i></i><span>SECURE CHANNEL ESTABLISHING</span><i></i></div>
+        <div class="boot-log" id="bootLog">
+          <span>&gt; INITIALIZING OPTICAL CORE</span>
+          <span>&gt; LOADING PHOTON PETAL TELEMETRY</span>
+          <span>&gt; SYNCING ORBITAL FRAME</span>
+        </div>
+        <div class="boot-meter">
+          <div class="boot-meter-top"><span>UPLINK / 光能链路</span><b><span id="bootPct">00</span><em>%</em></b></div>
+          <div class="boot-track"><i id="bootBar"></i></div>
+        </div>
+        <div class="boot-skip">光能传输阵列初始化中 · <b>点击跳过</b></div>
+      </div>
+      <div class="boot-footer" aria-hidden="true">
+        <span>EPR-SAT // 40,000 KM</span>
+        <span>ORIGINAL CONCEPT — NOT REAL DATA</span>
+        <span>BUILD 07.26</span>
+      </div>
+    </div>
+
+    <div class="modal" id="helpModal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <div class="panel-head">
+          <div class="panel-eyebrow"><i class="sq"></i><b>FIELD MANUAL</b><span>操作指南</span></div>
+          <button class="micro-btn modal-close" type="button" data-close-modal aria-label="关闭">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-title">
+            <span>EPR / LS-07</span>
+            <h2 id="helpTitle">五相阵列 · 交互手册</h2>
+            <p>这是一份原创五相阵列的三维概念可视化。拖拽轨道，或使用下方控制台逐级拆解这座五相轨道光能阵列。整机由十个功能段串成一条完整链路：六片光能采集帆阵汇聚光场，相位调制枢纽同步波前，能量压缩核心完成压缩与相位锁定，五路定向发射阵将能量耦合到主轴；六相接收耦合环接收花瓣光网的中继激光，能量缓冲主轴稳定传输节拍，轨道保持投射段沿中轴把光束投向地面，目标测定舱负责坐标解算，指向校正翼与余热耗散翼保障指向和热平衡。全展开时，六片花瓣光网的尖端会向六相接收耦合环的尾端接收环发射六路同色中继激光。</p>
+          </div>
+          <div class="manual-grid">
+            <div class="manual-item"><b><kbd>拖拽</kbd><kbd>滚轮</kbd></b><span>360° 环绕观察 / 缩放视距</span><em>ORBIT &amp; ZOOM</em></div>
+            <div class="manual-item"><b><kbd>单击部件</kbd></b><span>选中高亮；右上角「结构档案」查看</span><em>SELECT &amp; ARCHIVE</em></div>
+            <div class="manual-item"><b><kbd>双击部件</kbd></b><span>镜头聚焦该模块</span><em>FOCUS LENS</em></div>
+            <div class="manual-item"><b><kbd>SPACE</kbd></b><span>拆解 / 重组</span><em>DISASSEMBLY</em></div>
+            <div class="manual-item"><b><kbd>A</kbd><kbd>L</kbd><kbd>R</kbd></b><span>自动环绕 / 标注 / 复位</span><em>VIEW TOOLS</em></div>
+            <div class="manual-item"><b><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd></b><span>主视角 / 正视 / 侧视 / 俯视</span><em>CAMERA PRESETS</em></div>
+            <div class="manual-item"><b><kbd>M</kbd><kbd>F</kbd></b><span>声音 / 全屏</span><em>SYSTEM</em></div>
+            <div class="manual-item"><b><kbd>ESC</kbd></b><span>收起档案 / 取消选择 / 关闭弹窗</span><em>CANCEL</em></div>
+          </div>
+          <div class="manual-note">
+            <span class="note-mark">!</span>
+            <p><b>设定说明</b> 本页为原创五相阵列概念：186 m 全长、40,000 km 轨道、六秒变形等参数用于视觉呈现，不代表现实航天器数据。五相模式与光能传输机制属于科幻设定。</p>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <span>DRAG TO EXPLORE THE ORBITAL FRAME</span>
+          <button class="ghost-btn compact" type="button" data-close-modal>返回轨道</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="webgl-error" id="webglError">
+      <div>
+        <span>RENDER CHANNEL LOST</span>
+        <h2>无法建立三维链路</h2>
+        <p>请使用支持 WebGL 2 的现代浏览器（Chrome / Edge / Firefox）并启用硬件加速。</p>
+      </div>
+    </div>
+
+    <div class="cursor" id="cursor" aria-hidden="true">
+      <span class="cursor-ring"></span>
+      <span class="cursor-dot"></span>
+      <span class="cursor-label" id="cursorLabel"></span>
+    </div>
+
+    <div class="museum-hud" id="museumHud" hidden>
+      <div class="museum-top">
+        <div class="museum-brand">
+          <span>EPR / OPEN ORBIT MUSEUM</span>
+          <b>轨道光能阵列 · 开放宇宙博物馆</b>
+        </div>
+        <div class="museum-index">
+          <small>COLLECTION / 馆藏</small>
+          <b>01 — 05</b>
+          <span>DEEP SPACE / EARTH ORBIT</span>
+        </div>
+      </div>
+
+      <div class="museum-title">
+        <span class="museum-title-zh">开放宇宙<br>博物馆</span>
+        <span class="museum-title-en">THE OPEN ORBIT MUSEUM<br>EPR-OPT / LS-07</span>
+      </div>
+
+      <div class="museum-bottom">
+        <div class="museum-chapter">
+          <small>常设展 / PERMANENT EXHIBITION</small>
+          <b>01 · 五相 · 轨道光能阵列</b>
+          <p>卫星在馆外，宇宙就是展厅。</p>
+        </div>
+        <button class="museum-enter" id="museumEnterBtn" type="button">
+          <span>进入主展品</span>
+          <small>ENTER HERO EXHIBIT</small>
+          <i>→</i>
+        </button>
+      </div>
+
+      <div class="museum-hint">拖动环绕 · 滚轮缩放 · 点击卫星进入展品</div>
+      <div class="museum-scale"><span>ORBIT / 01</span><span>40,000 KM</span></div>
+    </div>
+
+    <button class="museum-back" id="museumBackBtn" type="button" hidden>
+      <span>←</span>
+      <b>博物馆总览</b>
+      <small>MUSEUM OVERVIEW</small>
+    </button>
+
+    <noscript>
+      <div class="noscript">此可视化需要启用 JavaScript 与 WebGL 2。</div>
+    </noscript>
+  </div>
+
+  <script>/*__APP__*/</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>开放宇宙博物馆 · ORBITAL MUSEUM</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+  body {
+    background: #02070d; color: #e9fcff;
+    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: opacity .32s ease;
+  }
+  body.is-leaving { opacity: 0; }
+  .space {
+    position: fixed; inset: 0;
+    background: url("assets/earth-space.jpg") center / cover no-repeat;
+    transform: scale(1.02);
+  }
+  .space::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(1,5,10,.55), transparent 30%, transparent 70%, rgba(1,5,10,.72)),
+      radial-gradient(ellipse at 55% 48%, transparent 30%, rgba(0,3,8,.28) 100%);
+  }
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 3; opacity: .08;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+  .museum-ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; transition: opacity .3s ease; }
+  body.is-leaving .museum-ui { opacity: 0; }
+
+  .top {
+    position: absolute; top: 30px; left: 36px; right: 36px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .brand small { color: rgba(112,224,243,.52); font: 9px Bahnschrift, sans-serif; letter-spacing: .26em; }
+  .brand h1 {
+    margin: 10px 0 0; color: #f1feff; font-size: 44px; line-height: .98;
+    letter-spacing: -.04em; font-weight: 800;
+  }
+  .brand p { margin: 13px 0 0; color: rgba(198,242,250,.55); font-size: 11px; letter-spacing: .22em; }
+  .collection { text-align: right; font-family: Bahnschrift, sans-serif; color: rgba(111,220,240,.42); }
+  .collection small { display: block; font-size: 9px; letter-spacing: .22em; }
+  .collection b { display: block; margin-top: 6px; color: #f3feff; font-size: 21px; font-weight: 500; letter-spacing: .1em; }
+  .collection span { display: block; margin-top: 5px; color: rgba(255,90,112,.55); font-size: 8px; letter-spacing: .16em; }
+
+  #orbitField { position: absolute; inset: 0; z-index: 7; pointer-events: none; }
+  #orbitField svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #orbitField .orbit-line { fill: none; stroke: rgba(100,228,248,.38); stroke-width: .8; filter: drop-shadow(0 0 5px rgba(100,228,248,.28)); }
+  #orbitField .orbit-ghost { fill: none; stroke: rgba(100,228,248,.14); stroke-width: .5; }
+
+  .sat-card {
+    position: absolute; pointer-events: auto; text-decoration: none; color: #e9fcff;
+    transform: translate(-50%, -50%);
+    transition: filter .25s ease, transform .25s ease;
+  }
+  .sat-card.ready {
+    width: 348px; border: 1px solid rgba(255,91,112,.58);
+    background: rgba(4,13,20,.78); box-shadow: 0 12px 38px rgba(0,0,0,.38), 0 0 30px rgba(255,70,95,.09);
+    overflow: hidden;
+  }
+  .sat-card.ready .thumb {
+    height: 190px; background-image: url("assets/ls07-preview.jpg"); background-size: cover; background-position: center;
+    filter: saturate(1.08) contrast(1.02);
+  }
+  .sat-card.ready .thumb::after {
+    content: ""; display: block; height: 100%;
+    background: linear-gradient(180deg, rgba(0,5,10,.04), rgba(0,5,10,.78));
+  }
+  .sat-card.ready .copy { padding: 13px 16px 14px; border-top: 1px solid rgba(255,91,112,.28); }
+  .sat-card.ready .copy small { color: rgba(112,224,243,.48); font: 8px Bahnschrift, sans-serif; letter-spacing: .18em; }
+  .sat-card.ready .copy b { display: block; margin-top: 5px; font-size: 16px; font-weight: 500; letter-spacing: .06em; }
+  .sat-card.ready .copy span { display: flex; justify-content: space-between; margin-top: 8px; color: #ff6576; font: 9px Bahnschrift, sans-serif; letter-spacing: .14em; }
+  .sat-card.ready:hover { filter: brightness(1.08); transform: translate(-50%, -50%) translateY(-3px); border-color: #ff7181; }
+
+  .sat-card.reserved {
+    width: 204px; min-height: 132px; border: 1px dashed rgba(102,224,245,.34);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(3,14,21,.42); text-align: center;
+  }
+  .sat-card.reserved::before {
+    content: ""; width: 26px; height: 26px; border: 1px solid rgba(102,224,245,.5);
+    transform: rotate(45deg); margin-bottom: 12px;
+  }
+  .sat-card.reserved b { color: rgba(195,242,251,.55); font: 11px Bahnschrift, sans-serif; letter-spacing: .2em; }
+  .sat-card.reserved span { color: rgba(112,224,243,.35); font-size: 9px; letter-spacing: .12em; margin-top: 5px; }
+
+  .bottom {
+    position: absolute; left: 36px; right: 36px; bottom: 28px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    color: rgba(120,211,228,.4); font: 9px Bahnschrift, sans-serif; letter-spacing: .15em;
+  }
+  .bottom b { color: rgba(233,253,255,.78); font-weight: 400; }
+  .bottom .hint { max-width: 560px; text-align: right; }
+  .bottom .hint strong { color: #ff6475; font-weight: 400; }
+
+  .corner {
+    position: absolute; z-index: 8; width: 48px; height: 48px; border-color: rgba(105,232,255,.24);
+    border-style: solid; border-width: 0;
+  }
+  .corner.tl { left: 22px; top: 22px; border-left-width: 1px; border-top-width: 1px; }
+  .corner.tr { right: 22px; top: 22px; border-right-width: 1px; border-top-width: 1px; }
+  .corner.bl { left: 22px; bottom: 22px; border-left-width: 1px; border-bottom-width: 1px; }
+  .corner.br { right: 22px; bottom: 22px; border-right-width: 1px; border-bottom-width: 1px; }
+
+  @media (max-width: 900px) {
+    .brand h1 { font-size: 34px; }
+    .sat-card.ready { width: 260px; }
+    .sat-card.ready .thumb { height: 140px; }
+    .sat-card.reserved { width: 150px; min-height: 104px; }
+    .bottom .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="space"></div>
+  <div class="grain"></div>
+  <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+
+  <main class="museum-ui">
+    <header class="top">
+      <div class="brand">
+        <small>EPR / OPEN ORBIT MUSEUM</small>
+        <h1>开放宇宙<br>博物馆</h1>
+        <p>THE OPEN ORBIT MUSEUM · EARTH ORBIT</p>
+      </div>
+      <div class="collection">
+        <small>COLLECTION / 馆藏</small>
+        <b>01 — 04</b>
+        <span>DEEP SPACE / EARTH ORBIT</span>
+      </div>
+    </header>
+
+    <div id="orbitField">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse class="orbit-line" cx="31" cy="50" rx="27" ry="34"></ellipse>
+        <ellipse class="orbit-ghost" cx="31" cy="50" rx="27.7" ry="34.7"></ellipse>
+      </svg>
+    </div>
+
+    <footer class="bottom">
+      <span><b>01 / 常设展</b> &nbsp; 拖拽/滚轮在展品页内观察</span>
+      <span class="hint"><strong>点击卫星</strong> 进入独立展品页 &nbsp;·&nbsp; 每颗卫星是独立项目</span>
+    </footer>
+  </main>
+
+  <script src="data.js"></script>
+  <script>
+    const field = document.querySelector('#orbitField')
+    const satellites = window.MUSEUM_SATELLITES || []
+    const cards = []
+    let paused = false
+    let last = performance.now()
+    let orbitPhase = 0
+
+    function buildCard(sat) {
+      const el = document.createElement(sat.state === 'ready' ? 'a' : 'div')
+      el.className = `sat-card ${sat.state === 'ready' ? 'ready' : 'reserved'}`
+      if (sat.state === 'ready') {
+        el.href = sat.route
+        el.innerHTML = `
+          <div class="thumb"></div>
+          <div class="copy">
+            <small>${sat.code} · ${sat.en}</small>
+            <b>${sat.name}</b>
+            <span><i>进入展品 / ENTER EXHIBIT</i><i>→</i></span>
+          </div>`
+        el.addEventListener('click', (event) => {
+          event.preventDefault()
+          document.body.classList.add('is-leaving')
+          window.setTimeout(() => { window.location.href = sat.route }, 280)
+        })
+      } else {
+        el.innerHTML = `<b>${sat.code} · 待布展</b><span>RESERVED BERTH</span>`
+      }
+      el.addEventListener('mouseenter', () => { paused = true })
+      el.addEventListener('mouseleave', () => { paused = false })
+      field.appendChild(el)
+      cards.push({
+        el,
+        base: (sat.angle || 0) * Math.PI / 180,
+        offset: (Math.random() - 0.5) * 0.15,
+      })
+    }
+
+    satellites.forEach(buildCard)
+
+    function layout(now) {
+      const dt = Math.min(0.05, (now - last) / 1000)
+      last = now
+      if (!paused) orbitPhase += dt * 0.055
+      for (const card of cards) {
+        const a = card.base + orbitPhase + card.offset
+        const x = 31 + Math.cos(a) * 27
+        const y = 50 + Math.sin(a) * 34
+        const depth = (Math.sin(a) + 1) / 2
+        card.el.style.left = `${x}%`
+        card.el.style.top = `${y}%`
+        card.el.style.zIndex = String(2 + Math.round(depth * 4))
+        card.el.style.opacity = String(0.64 + depth * 0.36)
+        if (card.el.classList.contains('reserved')) {
+          card.el.style.transform = `translate(-50%, -50%) scale(${0.82 + depth * 0.08})`
+        }
+      }
+      requestAnimationFrame(layout)
+    }
+    requestAnimationFrame(layout)
+  </script>
+</body>
+</html>

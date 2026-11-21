@@ -1,0 +1,20 @@
+{
+  "name": "epr-orbital-launcher",
+  "version": "1.0.0",
+  "private": true,
+  "description": "EPR 研究所 · 轨道卫星发射器 — 交互式 Three.js 旋转与拆解可视化",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "previews": "node tools/capture-previews.mjs"
+  },
+  "dependencies": {
+    "@fontsource/orbitron": "5.1.1",
+    "@fontsource/rajdhani": "5.1.0",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0",
+    "puppeteer-core": "^23.11.1"
+  }
+}
