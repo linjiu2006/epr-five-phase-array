@@ -67,31 +67,24 @@ https://<username>.github.io/<repo>/museum/
 
 默认进入龙。`?phase=ying` 可直接打开鹰。
 
-五张徽记图仍为当前占位版本，待后续替换为最终原创图。
+五张光徽已替换为新的五相光徽；旧版保留在 `media/emblems-legacy/`，不随 MIT 代码授权。
 
-## 旧版视觉记录
+## 五相光徽
 
-以下五张是改名前截图，HUD 和标题仍是旧版，仅作为开发记录，不代表当前五相版。
+五张光徽仍在重绘中，生成提示词见 [EMBLEM-PROMPTS.md](EMBLEM-PROMPTS.md)。
 
-![旧版 · 龙位](media/legacy/legacy-01-long.jpg)
+## 旧版开发记录
 
-![旧版 · 鹰位](media/legacy/legacy-02-ying.jpg)
+开发过程中曾临时借用《铠甲勇士》设定作为视觉参考。相关旧版截图见 [LEGACY.md](LEGACY.md)，仅作历史记录，不随 MIT 授权。
 
-![旧版 · 犀位](media/legacy/legacy-03-xi.jpg)
+## License
 
-![旧版 · 虎位](media/legacy/legacy-04-hu.jpg)
-
-![旧版 · 鹤位](media/legacy/legacy-05-he.jpg)
-
-> 如果要公开仓库，建议先删除 `media/legacy/` 或替换成五相版截图。
-
-## 授权状态
-
-当前仓库**未附开源许可证**，默认保留所有权利。
-
-- 代码、页面、图片暂不可商用或再分发。
+- **源代码：MIT**，见 [LICENSE](LICENSE)。
+- **视觉资产、徽记、截图：保留所有权利**，不包含在 MIT 授权中，见 [LICENSE-ASSETS.md](LICENSE-ASSETS.md)。
 - 第三方依赖许可见 [LICENSES.md](LICENSES.md)。
-- 若要开源代码，建议后续单独添加 MIT；图片不要与代码使用同一个许可证。
+- 旧版开发截图见 [LEGACY.md](LEGACY.md)，仅作历史记录；如权利人异议会删除。
+
+如果你要商用视觉资产，需要单独获得授权。
 
 ## 说明
 
