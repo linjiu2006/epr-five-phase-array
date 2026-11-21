@@ -71,11 +71,24 @@ https://<username>.github.io/<repo>/museum/
 
 ## 五相光徽
 
-五张光徽仍在重绘中，生成提示词见 [EMBLEM-PROMPTS.md](EMBLEM-PROMPTS.md)。
+五张光徽已替换为新的五相版本，旧版保留在 `media/emblems-legacy/`。生成提示词存档见 [EMBLEM-PROMPTS.md](EMBLEM-PROMPTS.md)。
 
-## 旧版开发记录
+## 效果展示（开发过程版本）
 
-开发过程中曾临时借用《铠甲勇士》设定作为视觉参考。相关旧版截图见 [LEGACY.md](LEGACY.md)，仅作历史记录，不随 MIT 授权。
+> 以下五张是开发过程中的效果展示。当时临时借用《铠甲勇士》设定作为视觉参考，仅作历史记录，不代表当前五相原创设定。  
+> 图片不随 MIT 授权；如相关权利人提出异议，会立即删除。详见 [LEGACY.md](LEGACY.md)。
+
+| 旧版 · 龙位 | 旧版 · 鹰位 |
+|:---:|:---:|
+| <img src="media/legacy/legacy-01-long.jpg" width="100%" alt="旧版开发效果 01"> | <img src="media/legacy/legacy-02-ying.jpg" width="100%" alt="旧版开发效果 02"> |
+
+| 旧版 · 犀位 | 旧版 · 虎位 |
+|:---:|:---:|
+| <img src="media/legacy/legacy-03-xi.jpg" width="100%" alt="旧版开发效果 03"> | <img src="media/legacy/legacy-04-hu.jpg" width="100%" alt="旧版开发效果 04"> |
+
+| 旧版 · 鹤位 |
+|:---:|
+| <img src="media/legacy/legacy-05-he.jpg" width="100%" alt="旧版开发效果 05"> |
 
 ## License
 
