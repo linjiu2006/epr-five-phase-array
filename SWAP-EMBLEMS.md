@@ -5,7 +5,7 @@
 ```text
 src/assets/emblems/red.jpg      龙
 src/assets/emblems/orange.jpg   虎
-src/assets/emblems/silver.jpg   鹤
+src/assets/emblems/silver.jpg   獒
 src/assets/emblems/green.jpg    犀
 src/assets/emblems/blue.jpg     鹰
 ```
@@ -56,14 +56,14 @@ powershell -ExecutionPolicy Bypass -File scripts\use-legacy-emblems.ps1
 |---|---|---|
 | `red.jpg` | 龙 | 红 |
 | `orange.jpg` | 虎 | 橙 |
-| `silver.jpg` | 鹤 | 银 |
+| `silver.jpg` | 獒 | 银 |
 | `green.jpg` | 犀 | 绿 |
 | `blue.jpg` | 鹰 | 蓝 |
 
 不要按菜单顺序替换。菜单顺序是：
 
 ```text
-龙 / 鹰 / 犀 / 虎 / 鹤
+龙 / 鹰 / 犀 / 虎 / 獒
 ```
 
 屏幕文件顺序是：

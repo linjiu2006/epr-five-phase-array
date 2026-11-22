@@ -63,7 +63,7 @@ https://<username>.github.io/<repo>/museum/
 - 鹰：蓝
 - 犀：绿
 - 虎：橙
-- 鹤：银
+- 獒：银
 
 默认进入龙。`?phase=ying` 可直接打开鹰。
 
@@ -86,7 +86,7 @@ https://<username>.github.io/<repo>/museum/
 |:---:|:---:|
 | <img src="media/legacy/legacy-03-xi.jpg" width="100%" alt="旧版开发效果 03"> | <img src="media/legacy/legacy-04-hu.jpg" width="100%" alt="旧版开发效果 04"> |
 
-| 旧版 · 鹤位 |
+| 旧版 · 獒位 |
 |:---:|
 | <img src="media/legacy/legacy-05-he.jpg" width="100%" alt="旧版开发效果 05"> |
 
