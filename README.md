@@ -67,11 +67,11 @@ https://<username>.github.io/<repo>/museum/
 
 默认进入龙。`?phase=ying` 可直接打开鹰。
 
-五张光徽已替换为新的五相光徽；旧版保留在 `media/emblems-legacy/`，不随 MIT 代码授权。
+当前线上使用旧版光徽；新版五相光徽保留在 `src/assets/emblems/new/`，替换方法见 [SWAP-EMBLEMS.md](SWAP-EMBLEMS.md)。
 
 ## 五相光徽
 
-五张光徽已替换为新的五相版本，旧版保留在 `media/emblems-legacy/`。生成提示词存档见 [EMBLEM-PROMPTS.md](EMBLEM-PROMPTS.md)。
+当前线上为旧版光徽；新版五相光徽与旧版备份都在 `src/assets/emblems/` 下。生成提示词存档见 [EMBLEM-PROMPTS.md](EMBLEM-PROMPTS.md)。
 
 ## 效果展示（开发过程版本）
 
@@ -93,7 +93,7 @@ https://<username>.github.io/<repo>/museum/
 ## License
 
 - **源代码：MIT**，见 [LICENSE](LICENSE)。
-- **视觉资产、徽记、截图：保留所有权利**，不包含在 MIT 授权中，见 [LICENSE-ASSETS.md](LICENSE-ASSETS.md)。
+- **视觉资产、徽记、截图：保留所有权利**，不包含在 MIT 授权中，见 [LICENSE-ASSETS.md](LICENSE-ASSETS.md)。旧光徽在 `src/assets/emblems/legacy/`，新版在 `src/assets/emblems/new/`。
 - 第三方依赖许可见 [LICENSES.md](LICENSES.md)。
 - 旧版开发截图见 [LEGACY.md](LEGACY.md)，仅作历史记录；如权利人异议会删除。
 
